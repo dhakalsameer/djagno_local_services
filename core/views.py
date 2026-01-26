@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.db.models import Count
 from django.db.models import Avg, Count
 from .models import Service, Booking
+from datetime import date
 
 
 
@@ -77,6 +78,15 @@ def book_service(request, pk):
     return render(request, 'booking/book.html', {'service': service})
 
 
+def service_detail(request, pk):
+    service = get_object_or_404(Service, pk=pk, is_active=True)
+
+    return render(request, 'services/detail.html', {
+        'service': service
+    })
+
+
+
 def home(request):
     total_services = Service.objects.filter(is_active=True).count()
 
@@ -97,3 +107,74 @@ def home(request):
         'top_services': top_services,
         'most_booked': most_booked,
     })
+
+
+
+@login_required
+def book_service(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+
+    error = None
+
+    if request.method == 'POST':
+        booking_date = request.POST['date']
+        start_time = request.POST['start']
+        end_time = request.POST['end']
+
+        exists = Booking.objects.filter(
+            service=service,
+            booking_date=booking_date,
+            start_time=start_time,
+            status__in=['pending', 'accepted']
+        ).exists()
+
+        if exists:
+            error = "This time slot is already booked."
+        else:
+            Booking.objects.create(
+                customer=request.user,
+                service=service,
+                booking_date=booking_date,
+                start_time=start_time,
+                end_time=end_time
+            )
+            return redirect('service_detail', pk=service.id)
+
+    return render(request, 'booking/book.html', {
+        'service': service,
+        'today': date.today(),
+        'error': error
+    })
+
+
+
+
+@login_required
+def provider_dashboard(request):
+    if request.user.profile.role != 'provider':
+        return redirect('home')
+
+    services = Service.objects.filter(provider=request.user)
+    bookings = Booking.objects.filter(
+        service__provider=request.user
+    ).order_by('-created_at')
+
+    return render(request, 'dashboard/provider.html', {
+        'services': services,
+        'bookings': bookings
+    })
+
+
+@login_required
+def update_booking_status(request, booking_id, status):
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        service__provider=request.user
+    )
+
+    if status in ['accepted', 'cancelled']:
+        booking.status = status
+        booking.save()
+
+    return redirect('provider_dashboard')

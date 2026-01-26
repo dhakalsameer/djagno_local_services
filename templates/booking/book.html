@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block content %}
+
+<h2 class="text-2xl font-bold mb-4">Book {{ service.title }}</h2>
+
+{% if error %}
+<p class="text-red-500 mb-3">{{ error }}</p>
+{% endif %}
+
+<form method="post" class="bg-white p-6 rounded shadow max-w-md">
+  {% csrf_token %}
+
+  <label class="block mb-2">Date</label>
+  <input
+    type="date"
+    name="date"
+    min="{{ today }}"
+    class="border p-2 w-full mb-4"
+    required
+  />
+
+  <label class="block mb-2">Start Time</label>
+  <input type="time" name="start" class="border p-2 w-full mb-4" required />
+
+  <label class="block mb-2">End Time</label>
+  <input type="time" name="end" class="border p-2 w-full mb-4" required />
+
+  <button class="bg-green-600 text-white px-4 py-2 rounded">
+    Confirm Booking
+  </button>
+</form>
+
+{% endblock %}

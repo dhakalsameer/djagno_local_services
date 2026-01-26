@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block content %}
+
+<h1 class="text-3xl font-bold mb-6">Provider Dashboard 🇳🇵</h1>
+
+<h2 class="text-xl font-semibold mb-3">Your Services</h2>
+
+<ul class="mb-6">
+  {% for service in services %}
+  <li class="bg-white p-3 mb-2 rounded shadow">
+    {{ service.title }} – 📍 {{ service.location }}
+  </li>
+  {% empty %}
+  <li>No services yet</li>
+  {% endfor %}
+</ul>
+
+<h2 class="text-xl font-semibold mb-3">Booking Requests</h2>
+
+<ul>
+  {% for booking in bookings %}
+  <li class="bg-white p-3 mb-2 rounded shadow">
+    {{ booking.service.title }} | {{ booking.booking_date }} | 👤 {{
+    booking.customer.username }} | Status: {{ booking.status }}
+  </li>
+  {% empty %}
+  <li>No bookings yet</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

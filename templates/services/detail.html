@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="bg-white p-6 rounded shadow">
+  <h1 class="text-3xl font-bold mb-2">{{ service.title }}</h1>
+
+  <p class="text-gray-600 mb-2">📍 {{ service.location }}</p>
+
+  <p class="text-gray-600 mb-2">👤 Provider: {{ service.provider.username }}</p>
+
+  <p class="mb-4">{{ service.description }}</p>
+
+  <p class="font-semibold mb-4">
+    💰 Price: Rs {{ service.price }} ({{ service.price_type }})
+  </p>
+
+  <a
+    href="{% url 'book_service' service.id %}"
+    class="bg-blue-600 text-white px-4 py-2 rounded"
+  >
+    Book This Service
+  </a>
+</div>
+
+{% endblock %}
