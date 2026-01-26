@@ -1,0 +1,24 @@
+<nav class="bg-white shadow mb-6">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+    <a href="/" class="text-xl font-bold text-blue-600">
+      🇳🇵 Local Services Nepal
+    </a>
+
+    <div class="space-x-4">
+      {% if user.is_authenticated %}
+        <span class="text-sm text-gray-600">
+          Hello, {{ user.username }}
+        </span>
+
+        <a href="/logout/" class="text-red-500 hover:underline">
+          Logout
+        </a>
+      {% else %}
+        <a href="/login/" class="hover:underline">Login</a>
+        <a href="/register/" class="hover:underline">Register</a>
+      {% endif %}
+    </div>
+
+  </div>
+</nav>
