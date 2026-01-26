@@ -9,6 +9,18 @@
 
   <p class="mb-4">{{ service.description }}</p>
 
+  <h3 class="text-xl font-semibold mt-6 mb-2">Reviews</h3>
+
+  {% for review in service.reviews.all %}
+  <div class="bg-gray-100 p-3 mb-2 rounded">
+    ⭐ {{ review.rating }}<br />
+    {{ review.comment }}<br />
+    <small>— {{ review.customer.username }}</small>
+  </div>
+  {% empty %}
+  <p>No reviews yet.</p>
+  {% endfor %}
+
   <p class="font-semibold mb-4">
     💰 Price: Rs {{ service.price }} ({{ service.price_type }})
   </p>

@@ -16,6 +16,8 @@ urlpatterns = [
     name='update_booking_status'
    ),
    path('dashboard/customer/', customer_dashboard, name='customer_dashboard'),
+   path('service/<int:service_id>/review/', add_review, name='add_review'),
+
 ]
 
 

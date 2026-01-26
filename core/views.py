@@ -8,7 +8,7 @@ from django.db.models import Count
 from django.db.models import Avg, Count
 from .models import Service, Booking
 from datetime import date
-
+from .forms import ReviewForm
 
 
 # Create your views here.
@@ -185,4 +185,31 @@ def customer_dashboard(request):
 
     return render(request, 'dashboard/customer.html', {
         'bookings': bookings
+    })
+
+
+@login_required
+def add_review(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+
+    has_completed = Booking.objects.filter(
+        service=service,
+        customer=request.user,
+        status='completed'
+    ).exists()
+
+    if not has_completed:
+        return redirect('service_detail', pk=service.id)
+
+    form = ReviewForm(request.POST or None)
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.service = service
+        review.customer = request.user
+        review.save()
+        return redirect('service_detail', pk=service.id)
+
+    return render(request, 'reviews/add.html', {
+        'form': form,
+        'service': service
     })
