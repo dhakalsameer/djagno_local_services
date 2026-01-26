@@ -17,14 +17,23 @@
 <h2 class="text-xl font-semibold mb-3">Booking Requests</h2>
 
 <ul>
-  {% for booking in bookings %}
-  <li class="bg-white p-3 mb-2 rounded shadow">
-    {{ booking.service.title }} | {{ booking.booking_date }} | 👤 {{
-    booking.customer.username }} | Status: {{ booking.status }}
-  </li>
-  {% empty %}
-  <li>No bookings yet</li>
-  {% endfor %}
+  {% for booking in bookings %} {% if booking.status == 'pending' %}
+  <a
+    href="{% url 'update_booking_status' booking.id 'accepted' %}"
+    class="text-green-600 mr-3"
+  >
+    Accept
+  </a>
+
+  <a
+    href="{% url 'update_booking_status' booking.id 'cancelled' %}"
+    class="text-red-600"
+  >
+    Reject
+  </a>
+  {% else %}
+  <span class="text-sm text-gray-500"> {{ booking.status|title }} </span>
+  {% endif %} {% endfor %}
 </ul>
 
 {% endblock %}

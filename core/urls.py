@@ -10,8 +10,12 @@ urlpatterns = [
     path('service/<int:pk>/book/', book_service, name='book_service'),
     path('service/<int:pk>/', service_detail, name='service_detail'),
     path('dashboard/provider/', provider_dashboard, name='provider_dashboard'),
-
-
+    path(
+    'booking/<int:booking_id>/<str:status>/',
+    update_booking_status,
+    name='update_booking_status'
+   ),
+   path('dashboard/customer/', customer_dashboard, name='customer_dashboard'),
 ]
 
 
