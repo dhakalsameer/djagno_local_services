@@ -5,6 +5,9 @@ from .forms import ServiceForm
 from .models import Booking
 from django.db.models import Q
 from django.db.models import Count
+from django.db.models import Avg, Count
+from .models import Service, Booking
+
 
 
 # Create your views here.
@@ -76,14 +79,21 @@ def book_service(request, pk):
 
 def home(request):
     total_services = Service.objects.filter(is_active=True).count()
-    top_categories = (
+
+    top_services = (
         Service.objects
-        .values('category__name')
-        .annotate(count=Count('id'))
-        .order_by('-count')[:5]
+        .annotate(avg_rating=Avg('reviews__rating'))
+        .order_by('-avg_rating')[:5]
+    )
+
+    most_booked = (
+        Service.objects
+        .annotate(total_bookings=Count('bookings'))
+        .order_by('-total_bookings')[:5]
     )
 
     return render(request, 'home.html', {
         'total_services': total_services,
-        'top_categories': top_categories
+        'top_services': top_services,
+        'most_booked': most_booked,
     })
