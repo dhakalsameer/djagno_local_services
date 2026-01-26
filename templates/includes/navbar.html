@@ -1,28 +1,69 @@
 <nav class="bg-white shadow mb-6">
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <!-- Logo -->
-    <a href="/" class="text-xl font-bold text-blue-600">
+    <!-- LEFT: Brand -->
+    <a href="{% url 'home' %}" class="text-xl font-bold text-blue-600">
       🇳🇵 Local Services Nepal
     </a>
 
-    <!-- Right Side -->
-    <div class="space-x-4 flex items-center">
+    <!-- RIGHT -->
+    <div class="flex items-center space-x-6">
       {% if user.is_authenticated %}
-      <span class="text-sm text-gray-600"> Hello, {{ user.username }} </span>
 
+      <!-- PROVIDER DASHBOARD LINK (highlighted) -->
       {% if user.profile.role == 'provider' %}
-      <a href="{% url 'provider_dashboard' %}" class="hover:underline">
+      <a
+        href="{% url 'provider_dashboard' %}"
+        class="{% if 'dashboard/provider' in request.path %} font-bold text-blue-600 {% else %} text-gray-700 hover:text-blue-600 {% endif %}"
+      >
         Dashboard
       </a>
       {% endif %}
 
-      <a href="{% url 'logout' %}" class="text-red-500 hover:underline">
-        Logout
-      </a>
+      <!-- PROFILE DROPDOWN -->
+      <div class="relative group">
+        <button
+          class="font-medium text-gray-700 hover:text-blue-600 focus:outline-none"
+        >
+          {{ user.username }} ⌄
+        </button>
+
+        <!-- DROPDOWN MENU -->
+        <div
+          class="absolute right-0 mt-2 w-44 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-50"
+        >
+          {% if user.profile.role == 'provider' %}
+          <a
+            href="{% url 'provider_dashboard' %}"
+            class="block px-4 py-2 hover:bg-gray-100"
+          >
+            Provider Dashboard
+          </a>
+          {% else %}
+          <a
+            href="{% url 'customer_dashboard' %}"
+            class="block px-4 py-2 hover:bg-gray-100"
+          >
+            My Bookings
+          </a>
+          {% endif %}
+
+          <hr class="my-1" />
+
+          <a
+            href="{% url 'logout' %}"
+            class="block px-4 py-2 text-red-600 hover:bg-gray-100"
+          >
+            Logout
+          </a>
+        </div>
+      </div>
 
       {% else %}
-      <a href="{% url 'login' %}" class="hover:underline"> Login </a>
-      <a href="{% url 'register' %}" class="hover:underline"> Register </a>
+
+      <!-- AUTH LINKS -->
+      <a href="{% url 'login' %}" class="hover:underline">Login</a>
+      <a href="{% url 'register' %}" class="hover:underline">Register</a>
+
       {% endif %}
     </div>
   </div>
