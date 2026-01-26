@@ -1,0 +1,12 @@
+<h1>Local Services Marketplace</h1>
+
+<p>Total Services: {{ total_services }}</p>
+
+<h3>Top Categories</h3>
+<ul>
+  {% for cat in top_categories %}
+    <li>{{ cat.category__name }} ({{ cat.count }})</li>
+  {% empty %}
+    <li>No categories yet</li>
+  {% endfor %}
+</ul>
