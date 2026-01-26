@@ -1,7 +1,78 @@
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  <input name="username" placeholder="Username">
-  <input name="password" type="password" placeholder="Password">
-  <button type="submit">Login</button>
-</form>
+{% extends "base.html" %} {% block content %}
+
+<div
+  class="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-100 to-blue-200"
+>
+  <div
+    class="relative bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md overflow-hidden"
+  >
+    <!-- Background Accent Circle -->
+    <div
+      class="absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-30 blur-3xl"
+    ></div>
+
+    <h2 class="text-4xl font-bold text-center text-gray-800 mb-2 relative z-10">
+      Welcome Back
+    </h2>
+    <p class="text-center text-gray-500 mb-8 relative z-10">
+      Login to your account
+    </p>
+
+    <form method="post" class="space-y-6 relative z-10">
+      {% csrf_token %}
+
+      <!-- Username Field with Floating Label -->
+      <div class="relative">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder=" "
+          class="peer w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+        />
+        <label
+          for="username"
+          class="absolute left-4 top-3 text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:text-blue-500 peer-focus:text-sm"
+        >
+          Username
+        </label>
+      </div>
+
+      <!-- Password Field with Floating Label -->
+      <div class="relative">
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder=" "
+          class="peer w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+        />
+        <label
+          for="password"
+          class="absolute left-4 top-3 text-gray-400 text-sm transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:text-blue-500 peer-focus:text-sm"
+        >
+          Password
+        </label>
+      </div>
+
+      <!-- Gradient Login Button -->
+      <button
+        type="submit"
+        class="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200"
+      >
+        Login
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-gray-500 relative z-10">
+      Don’t have an account?
+      <a
+        href="{% url 'register' %}"
+        class="text-blue-600 font-semibold hover:underline"
+        >Sign Up</a
+      >
+    </p>
+  </div>
+</div>
+
+{% endblock %}
