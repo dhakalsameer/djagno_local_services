@@ -9,13 +9,20 @@
     <div class="flex items-center space-x-6">
       {% if user.is_authenticated %}
 
-      <!-- PROVIDER DASHBOARD LINK (highlighted) -->
+      <!-- PROVIDER/CUSTOMER DASHBOARD LINK -->
       {% if user.profile.role == 'provider' %}
       <a
         href="{% url 'provider_dashboard' %}"
-        class="{% if 'dashboard/provider' in request.path %} font-bold text-blue-600 {% else %} text-gray-700 hover:text-blue-600 {% endif %}"
+        class="{% if 'dashboard/provider' in request.path %}font-bold text-blue-600{% else %}text-gray-700 hover:text-blue-600{% endif %}"
       >
         Dashboard
+      </a>
+      {% else %}
+      <a
+        href="{% url 'customer_dashboard' %}"
+        class="{% if 'dashboard/customer' in request.path %}font-bold text-blue-600{% else %}text-gray-700 hover:text-blue-600{% endif %}"
+      >
+        My Bookings
       </a>
       {% endif %}
 
