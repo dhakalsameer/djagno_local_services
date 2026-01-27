@@ -2,7 +2,9 @@
 
 <h1 class="text-3xl font-bold mb-6">Provider Dashboard 🇳🇵</h1>
 
+<!-- SERVICES -->
 <h2 class="text-xl font-semibold mb-3">Your Services</h2>
+
 <a
   href="{% url 'service_create' %}"
   class="bg-green-600 text-white px-4 py-2 rounded inline-block mb-4"
@@ -10,36 +12,67 @@
   ➕ Add New Service
 </a>
 
-<ul class="mb-6">
+<ul class="mb-8">
   {% for service in services %}
-  <li class="bg-white p-3 mb-2 rounded shadow">
-    {{ service.title }} – 📍 {{ service.location }}
+  <li class="bg-white p-4 mb-3 rounded shadow">
+    <strong>{{ service.title }}</strong> – 📍 {{ service.location }}
+
+    <div class="mt-2 text-sm">
+      <a href="{% url 'service_detail' service.id %}" class="text-blue-600 mr-3"
+        >View</a
+      >
+
+      <a
+        href="{% url 'service_update' service.id %}"
+        class="text-yellow-600 mr-3"
+        >Edit</a
+      >
+
+      <a
+        href="{% url 'service_delete' service.id %}"
+        class="text-red-600"
+        onclick="return confirm('Delete this service?');"
+      >
+        Delete
+      </a>
+    </div>
   </li>
   {% empty %}
   <li>No services yet</li>
   {% endfor %}
 </ul>
 
+<!-- BOOKINGS -->
 <h2 class="text-xl font-semibold mb-3">Booking Requests</h2>
 
 <ul>
-  {% for booking in bookings %} {% if booking.status == 'pending' %}
-  <a
-    href="{% url 'update_booking_status' booking.id 'accepted' %}"
-    class="text-green-600 mr-3"
-  >
-    Accept
-  </a>
+  {% for booking in bookings %}
+  <li class="bg-gray-100 p-4 mb-3 rounded">
+    <strong>{{ booking.service.title }}</strong><br />
+    👤 {{ booking.customer.username }} <br />
+    📅 {{ booking.booking_date }} | ⏰ {{ booking.start_time }} <br />
 
-  <a
-    href="{% url 'update_booking_status' booking.id 'cancelled' %}"
-    class="text-red-600"
-  >
-    Reject
-  </a>
-  {% else %}
-  <span class="text-sm text-gray-500"> {{ booking.status|title }} </span>
-  {% endif %} {% endfor %}
+    {% if booking.status == 'pending' %}
+    <a
+      href="{% url 'update_booking_status' booking.id 'accepted' %}"
+      class="text-green-600 mr-3"
+      >✔ Accept</a
+    >
+
+    <a
+      href="{% url 'update_booking_status' booking.id 'cancelled' %}"
+      class="text-red-600"
+      >✖ Reject</a
+    >
+    {% else %}
+    <span class="text-sm text-gray-600">
+      Status: {{ booking.status|title }}
+    </span>
+    {% endif %}
+  </li>
+  {% empty %}
+  <li>No booking requests.</li>
+  {% endfor %}
 </ul>
 
 {% endblock %}

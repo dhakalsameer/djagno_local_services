@@ -5,10 +5,40 @@
 <ul>
   {% for booking in bookings %}
   <li class="bg-white p-4 mb-3 rounded shadow">
-    <strong>{{ booking.service.title }}</strong><br />
+    <strong>
+      <a
+        href="{% url 'service_detail' booking.service.id %}"
+        class="text-blue-600"
+      >
+        {{ booking.service.title }}
+      </a> </strong
+    ><br />
+
     📍 {{ booking.service.location }}<br />
     📅 {{ booking.booking_date }}<br />
-    Status: {{ booking.status|title }}
+
+    <span class="font-medium">
+      Status: {% if booking.status == 'pending' %}
+      <span class="text-yellow-600">Pending</span>
+      {% elif booking.status == 'accepted' %}
+      <span class="text-green-600">Accepted</span>
+      {% elif booking.status == 'completed' %}
+      <span class="text-blue-600">Completed</span>
+      {% else %}
+      <span class="text-red-600">Cancelled</span>
+      {% endif %}
+    </span>
+
+    {% if booking.status == 'completed' %}
+    <div class="mt-2">
+      <a
+        href="{% url 'add_review' booking.service.id %}"
+        class="text-sm text-blue-600 underline"
+      >
+        ✍️ Add Review
+      </a>
+    </div>
+    {% endif %}
   </li>
   {% empty %}
   <li>No bookings yet.</li>
