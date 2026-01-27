@@ -45,4 +45,24 @@
   {% endfor %}
 </ul>
 
-{% endblock %}
+<h2 class="text-2xl font-bold mb-4 mt-8">Book a Service</h2>
+
+{% if user_role != 'provider' %}
+<ul>
+  {% for service in services %}
+  <li class="bg-gray-100 p-4 mb-3 rounded shadow">
+    <strong>{{ service.title }}</strong><br />
+    📍 {{ service.location }}<br />
+
+    <a
+      href="{% url 'book_service' service.id %}"
+      class="bg-green-600 text-white px-4 py-2 rounded mt-2 inline-block"
+    >
+      Book Now
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="text-gray-600">Providers cannot book services.</p>
+{% endif %} {% endblock %}

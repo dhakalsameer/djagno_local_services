@@ -25,12 +25,24 @@
       >
         View Details →
       </a>
+
+      {% if user_role != 'provider' %}
+      <!-- Customer sees Book Now -->
       <a
         href="{% url 'book_service' service.id %}"
         class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
         Book Now
       </a>
+      {% elif user_role == 'provider' and service.provider == request.user %}
+      <!-- Provider sees Edit only on their own services -->
+      <a
+        href="{% url 'service_update' service.id %}"
+        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+      >
+        Edit
+      </a>
+      {% endif %}
     </div>
   </div>
   {% empty %}
@@ -59,12 +71,22 @@
       >
         View Details →
       </a>
+
+      {% if user_role != 'provider' %}
       <a
         href="{% url 'book_service' service.id %}"
         class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
         Book Now
       </a>
+      {% elif user_role == 'provider' and service.provider == request.user %}
+      <a
+        href="{% url 'service_update' service.id %}"
+        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+      >
+        Edit
+      </a>
+      {% endif %}
     </div>
   </div>
   {% empty %}

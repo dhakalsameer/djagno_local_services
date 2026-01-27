@@ -87,6 +87,7 @@ def service_detail(request, pk):
 
 
 
+@login_required
 def home(request):
     total_services = Service.objects.filter(is_active=True).count()
 
@@ -102,10 +103,13 @@ def home(request):
         .order_by('-total_bookings')[:5]
     )
 
+    user_role = request.user.profile.role if hasattr(request.user, 'profile') else 'customer'
+
     return render(request, 'home.html', {
         'total_services': total_services,
         'top_services': top_services,
         'most_booked': most_booked,
+        'user_role': user_role
     })
 
 
