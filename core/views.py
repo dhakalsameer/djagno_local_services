@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Service
+from .models import Service, ServiceCategory
 from .forms import ServiceForm
 from .models import Booking
 from django.db.models import Q
@@ -23,13 +23,25 @@ def service_create(request):
     if request.user.profile.role != 'provider':
         return redirect('service_list')
 
-    form = ServiceForm(request.POST or None)
+    form = ServiceForm(request.POST or None, request.FILES or None, user=request.user)
     if form.is_valid():
         service = form.save(commit=False)
+        
+        # Check if provider entered a new category
+        new_cat_name = form.cleaned_data.get('new_category')
+        if new_cat_name:
+            category, created = ServiceCategory.objects.get_or_create(
+                name=new_cat_name,
+                provider=request.user
+            )
+            service.category = category
+
         service.provider = request.user
         service.save()
-        return redirect('service_list')
+        return redirect('provider_dashboard')
+
     return render(request, 'services/form.html', {'form': form})
+
 
 
 @login_required
