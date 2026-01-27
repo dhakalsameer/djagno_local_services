@@ -1,36 +1,54 @@
 {% extends "base.html" %} {% block content %}
 
-<div class="bg-white p-6 rounded shadow">
+<div class="bg-white p-6 rounded shadow max-w-3xl mx-auto">
+  <!-- SERVICE INFO -->
   <h1 class="text-3xl font-bold mb-2">{{ service.title }}</h1>
 
-  <p class="text-gray-600 mb-2">📍 {{ service.location }}</p>
-
-  <p class="text-gray-600 mb-2">👤 Provider: {{ service.provider.username }}</p>
+  <p class="text-gray-600 mb-1">📍 {{ service.location }}</p>
+  <p class="text-gray-600 mb-3">👤 Provider: {{ service.provider.username }}</p>
 
   <p class="mb-4">{{ service.description }}</p>
 
-  <h3 class="text-xl font-semibold mt-6 mb-2">Reviews</h3>
-
-  {% for review in service.reviews.all %}
-  <div class="bg-gray-100 p-3 mb-2 rounded">
-    ⭐ {{ review.rating }}<br />
-    {{ review.comment }}<br />
-    <small>— {{ review.customer.username }}</small>
-  </div>
-  {% empty %}
-  <p>No reviews yet.</p>
-  {% endfor %}
-
-  <p class="font-semibold mb-4">
+  <p class="font-semibold mb-6">
     💰 Price: Rs {{ service.price }} ({{ service.price_type }})
   </p>
 
+  <!-- BOOK BUTTON (CUSTOMER ONLY) -->
+  {% if user.is_authenticated %} {% if user.profile.role == 'customer' %}
   <a
     href="{% url 'book_service' service.id %}"
-    class="bg-blue-600 text-white px-4 py-2 rounded"
+    class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
   >
-    Book This Service
+    📅 Book This Service
   </a>
+  {% endif %} {% else %}
+  <a href="{% url 'login' %}" class="bg-blue-600 text-white px-5 py-2 rounded">
+    Login to Book
+  </a>
+  {% endif %}
+
+  <!-- REVIEWS -->
+  <h3 class="text-xl font-semibold mt-8 mb-3">⭐ Reviews</h3>
+
+  {% for review in service.reviews.all %}
+  <div class="bg-gray-100 p-3 mb-3 rounded">
+    <strong>⭐ {{ review.rating }}/5</strong><br />
+    {{ review.comment }}<br />
+    <small class="text-gray-600"> — {{ review.customer.username }} </small>
+  </div>
+  {% empty %}
+  <p class="text-gray-500">No reviews yet.</p>
+  {% endfor %}
+
+  <!-- ADD REVIEW (ONLY AFTER COMPLETED BOOKING) -->
+  {% if user.is_authenticated and user.profile.role == 'customer' %}
+  <a
+    href="{% url 'add_review' service.id %}"
+    class="inline-block mt-4 text-blue-600 hover:underline"
+  >
+    ✍️ Add Review
+  </a>
+  {% endif %}
 </div>
 
 {% endblock %}
