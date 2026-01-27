@@ -182,9 +182,13 @@ def update_booking_status(request, booking_id, status):
 @login_required
 def customer_dashboard(request):
     bookings = Booking.objects.filter(customer=request.user).order_by('-created_at')
+    services = Service.objects.filter(is_active=True)
+    today = date.today()
 
     return render(request, 'dashboard/customer.html', {
-        'bookings': bookings
+        'bookings': bookings,
+        'services': services,
+        'today': today
     })
 
 

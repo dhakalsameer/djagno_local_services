@@ -7,33 +7,69 @@
 
 <div class="grid md:grid-cols-2 gap-4 mb-8">
   {% for service in top_services %}
-  <div class="bg-white p-4 rounded shadow">
-    <h3 class="font-bold text-lg">{{ service.title }}</h3>
-    <p class="text-sm text-gray-600">
-      📍 {{ service.location }} | 👤 {{ service.provider.username }}
-    </p>
-    <p class="mt-2">
-      ⭐ Rating: {{ service.avg_rating|default:"No ratings yet" }}
-    </p>
+  <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+    <div>
+      <h3 class="font-bold text-lg">{{ service.title }}</h3>
+      <p class="text-sm text-gray-600">
+        📍 {{ service.location }} | 👤 {{ service.provider.username }}
+      </p>
+      <p class="mt-2">
+        ⭐ Rating: {{ service.avg_rating|default:"No ratings yet" }}
+      </p>
+    </div>
+
+    <div class="mt-4 flex justify-between items-center">
+      <a
+        href="{% url 'service_detail' service.id %}"
+        class="text-blue-600 hover:underline"
+      >
+        View Details →
+      </a>
+      <a
+        href="{% url 'book_service' service.id %}"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Book Now
+      </a>
+    </div>
   </div>
   {% empty %}
   <p>No services yet.</p>
   {% endfor %}
 </div>
 
+<!-- Most Booked Services -->
 <h2 class="text-2xl font-semibold mb-3">🔥 Most Booked Services</h2>
 
 <div class="grid md:grid-cols-2 gap-4">
   {% for service in most_booked %}
-  <div class="bg-white p-4 rounded shadow">
-    <h3 class="font-bold text-lg">{{ service.title }}</h3>
-    <p class="text-sm text-gray-600">
-      📍 {{ service.location }} | 👤 {{ service.provider.username }}
-    </p>
-    <p class="mt-2">📅 Bookings: {{ service.total_bookings }}</p>
+  <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+    <div>
+      <h3 class="font-bold text-lg">{{ service.title }}</h3>
+      <p class="text-sm text-gray-600">
+        📍 {{ service.location }} | 👤 {{ service.provider.username }}
+      </p>
+      <p class="mt-2">📅 Bookings: {{ service.total_bookings }}</p>
+    </div>
+
+    <div class="mt-4 flex justify-between items-center">
+      <a
+        href="{% url 'service_detail' service.id %}"
+        class="text-blue-600 hover:underline"
+      >
+        View Details →
+      </a>
+      <a
+        href="{% url 'book_service' service.id %}"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Book Now
+      </a>
+    </div>
   </div>
   {% empty %}
   <p>No bookings yet.</p>
   {% endfor %}
 </div>
+
 {% endblock %}

@@ -1,21 +1,34 @@
 {% extends "base.html" %} {% block content %}
 
-<h1 class="text-3xl font-bold mb-6">Available Services</h1>
+<h1 class="text-3xl font-bold mb-6">Available Services 🇳🇵</h1>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
   {% for service in services %}
-  <div class="border p-4 rounded shadow">
-    <h2 class="text-xl font-semibold">{{ service.title }}</h2>
-    <p class="text-gray-600">{{ service.description|truncatechars:100 }}</p>
+  <div class="border p-4 rounded shadow flex flex-col justify-between">
+    <div>
+      <h2 class="text-xl font-semibold">{{ service.title }}</h2>
+      <p class="text-gray-600 mt-2">
+        {{ service.description|truncatechars:100 }}
+      </p>
+      <p class="mt-2 text-sm">Provider: {{ service.provider.username }}</p>
+      <p class="mt-1 text-sm">Location: {{ service.location }}</p>
+    </div>
 
-    <p class="mt-2 text-sm">Provider: {{ service.provider.username }}</p>
+    <div class="mt-4 flex justify-between items-center">
+      <a
+        href="{% url 'service_detail' service.id %}"
+        class="text-blue-600 hover:underline"
+      >
+        View Details →
+      </a>
 
-    <a
-      href="{% url 'service_detail' service.id %}"
-      class="text-blue-600 mt-3 inline-block"
-    >
-      View Details →
-    </a>
+      <a
+        href="{% url 'book_service' service.id %}"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Book Now
+      </a>
+    </div>
   </div>
   {% empty %}
   <p>No services available.</p>
