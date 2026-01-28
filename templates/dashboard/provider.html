@@ -1,78 +1,94 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 
-<h1 class="text-3xl font-bold mb-6">Provider Dashboard 🇳🇵</h1>
+<div class="container mx-auto px-4 py-6">
+  <h1 class="text-3xl font-bold mb-6">Provider Dashboard 🇳🇵</h1>
 
-<!-- SERVICES -->
-<h2 class="text-xl font-semibold mb-3">Your Services</h2>
-
-<a
-  href="{% url 'service_create' %}"
-  class="bg-green-600 text-white px-4 py-2 rounded inline-block mb-4"
->
-  ➕ Add New Service
-</a>
-
-<ul class="mb-8">
-  {% for service in services %}
-  <li class="bg-white p-4 mb-3 rounded shadow">
-    <strong>{{ service.title }}</strong> – 📍 {{ service.location }}
-
-    <div class="mt-2 text-sm">
-      <a href="{% url 'service_detail' service.id %}" class="text-blue-600 mr-3"
-        >View</a
-      >
-
-      <a
-        href="{% url 'service_update' service.id %}"
-        class="text-yellow-600 mr-3"
-        >Edit</a
-      >
-
-      <a
-        href="{% url 'service_delete' service.id %}"
-        class="text-red-600"
-        onclick="return confirm('Delete this service?');"
-      >
-        Delete
+  <!-- SERVICES -->
+  <section class="mb-10">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold">Your Services</h2>
+      <a href="{% url 'service_create' %}" class="bg-green-600 text-white px-5 py-2 rounded shadow hover:bg-green-700 transition">
+        ➕ Add New Service
       </a>
     </div>
-  </li>
-  {% empty %}
-  <li>No services yet</li>
-  {% endfor %}
-</ul>
 
-<!-- BOOKINGS -->
-<h2 class="text-xl font-semibold mb-3">Booking Requests</h2>
+    {% if services %}
+    <div class="grid md:grid-cols-2 gap-6">
+      {% for service in services %}
+      <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-5 flex flex-col justify-between">
+        <div>
+          <h3 class="text-lg font-bold mb-1">{{ service.title }}</h3>
+          <p class="text-sm text-gray-500 mb-2">📍 {{ service.location }}</p>
+          <p class="text-gray-700">💰 Price: {{ service.price|default:"N/A" }}</p>
+          <p class="text-gray-700">🕒 Duration: {{ service.duration|default:"N/A" }}</p>
+        </div>
 
-<ul>
-  {% for booking in bookings %}
-  <li class="bg-gray-100 p-4 mb-3 rounded">
-    <strong>{{ booking.service.title }}</strong><br />
-    👤 {{ booking.customer.username }} <br />
-    📅 {{ booking.booking_date }} | ⏰ {{ booking.start_time }} <br />
-
-    {% if booking.status == 'pending' %}
-    <a
-      href="{% url 'update_booking_status' booking.id 'accepted' %}"
-      class="text-green-600 mr-3"
-      >✔ Accept</a
-    >
-
-    <a
-      href="{% url 'update_booking_status' booking.id 'cancelled' %}"
-      class="text-red-600"
-      >✖ Reject</a
-    >
+        <div class="mt-4 flex space-x-3 text-sm">
+          <a href="{% url 'service_detail' service.id %}" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">View</a>
+          <a href="{% url 'service_update' service.id %}" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">Edit</a>
+          <a href="{% url 'service_delete' service.id %}" onclick="return confirm('Delete this service?');" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition">Delete</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
     {% else %}
-    <span class="text-sm text-gray-600">
-      Status: {{ booking.status|title }}
-    </span>
+      <p class="text-gray-500">No services yet.</p>
     {% endif %}
-  </li>
-  {% empty %}
-  <li>No booking requests.</li>
-  {% endfor %}
-</ul>
+  </section>
+
+  <!-- BOOKINGS -->
+  <section>
+    <h2 class="text-2xl font-semibold mb-4">📋 Booking Requests</h2>
+
+    {% if bookings %}
+    <div class="grid md:grid-cols-2 gap-6">
+      {% for booking in bookings %}
+      <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-5 flex flex-col justify-between">
+        <!-- Customer Info -->
+        <div class="flex items-center mb-3">
+          {% if booking.customer.profile.profile_photo %}
+            <img src="{{ booking.customer.profile.profile_photo.url }}" alt="{{ booking.customer.username }}" class="w-12 h-12 rounded-full object-cover mr-3">
+          {% else %}
+            <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center mr-3 text-gray-600 font-bold">
+              {{ booking.customer.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+          <div>
+            <p class="font-semibold">{{ booking.customer.get_full_name|default:booking.customer.username }}</p>
+            <p class="text-gray-500 text-sm">{{ booking.customer.username }} | {{ booking.customer.profile.city }}</p>
+          </div>
+        </div>
+
+        <!-- Booking Details -->
+        <p class="text-gray-700 mb-1"><strong>Service:</strong> {{ booking.service.title }}</p>
+        <p class="text-gray-700 mb-1">
+          <strong>Date & Time:</strong> 
+          📅 {{ booking.booking_date|date:"M d, Y" }} | ⏰ {{ booking.start_time|time:"h:i A" }} - {{ booking.end_time|time:"h:i A" }}
+        </p>
+
+        <!-- Booking Status -->
+        <div class="mt-3 flex flex-wrap gap-2">
+          {% if booking.status == 'pending' %}
+            <a href="{% url 'update_booking_status' booking.id 'accepted' %}" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm transition">✔ Accept</a>
+            <a href="{% url 'update_booking_status' booking.id 'cancelled' %}" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm transition">✖ Reject</a>
+          {% else %}
+            <span class="text-sm font-medium px-3 py-1 rounded 
+              {% if booking.status == 'accepted' %}bg-green-100 text-green-700
+              {% elif booking.status == 'completed' %}bg-blue-100 text-blue-700
+              {% elif booking.status == 'cancelled' %}bg-red-100 text-red-700
+              {% endif %}">
+              {{ booking.status|title }}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="text-gray-500">No booking requests.</p>
+    {% endif %}
+  </section>
+</div>
 
 {% endblock %}

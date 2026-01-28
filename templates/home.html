@@ -18,7 +18,8 @@
     <img 
       src="{{ service.provider.profile.profile_photo.url }}" 
       alt="{{ service.provider.username }}" 
-      class="w-6 h-6 rounded-full"
+      class="w-6 h-6 rounded-full object-cover"
+
     >
     {{ service.provider.username }} 
   {% else %}
@@ -84,7 +85,7 @@
     <img 
       src="{{ service.provider.profile.profile_photo.url }}" 
       alt="{{ service.provider.username }}" 
-      class="w-6 h-6 rounded-full"
+      class="w-6 h-6 rounded-full object-cover"
     >
     {{ service.provider.username }} 
   {% else %}
