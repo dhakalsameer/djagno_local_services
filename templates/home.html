@@ -12,9 +12,20 @@
         <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
           <div>
             <h3 class="font-bold text-lg">{{ service.title }}</h3>
-            <p class="text-sm text-gray-600">
-              📍 {{ service.location }} | 👤 {{ service.provider.username }}
-            </p>
+            <p class="text-sm text-gray-600 flex items-center gap-2">
+  📍 {{ service.location }} |
+  {% if service.provider.profile.profile_photo %}
+    <img 
+      src="{{ service.provider.profile.profile_photo.url }}" 
+      alt="{{ service.provider.username }}" 
+      class="w-6 h-6 rounded-full"
+    >
+    {{ service.provider.username }} 
+  {% else %}
+    👤 {{ service.provider.username }}
+  {% endif %}
+</p>
+
             <p class="mt-2">
               ⭐ Rating: {{ service.avg_rating|default:"No ratings yet" }}
             </p>
@@ -67,9 +78,20 @@
         <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
           <div>
             <h3 class="font-bold text-lg">{{ service.title }}</h3>
-            <p class="text-sm text-gray-600">
-              📍 {{ service.location }} | 👤 {{ service.provider.username }}
-            </p>
+            <p class="text-sm text-gray-600 flex items-center gap-2">
+  📍 {{ service.location }} | 
+  {% if service.provider.profile.profile_photo %}
+    <img 
+      src="{{ service.provider.profile.profile_photo.url }}" 
+      alt="{{ service.provider.username }}" 
+      class="w-6 h-6 rounded-full"
+    >
+    {{ service.provider.username }} 
+  {% else %}
+    👤 {{ service.provider.username }}
+  {% endif %}
+</p>
+
             <p class="mt-2">📅 Bookings: {{ service.total_bookings }}</p>
           </div>
 
