@@ -298,12 +298,14 @@ def customer_dashboard(request):
     bookings = Booking.objects.filter(customer=request.user).order_by('-created_at')
     services = Service.objects.filter(is_active=True)
     today = date.today()
+    booked_service_ids = bookings.values_list('service_id', flat=True)
 
     return render(request, 'dashboard/customer.html', {
         'bookings': bookings,
         'services': services,
         'today': today,
         'user_role': request.user.profile.role,
+        'booked_service_ids': booked_service_ids,
     })
 
 
