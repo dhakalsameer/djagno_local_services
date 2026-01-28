@@ -1,3 +1,4 @@
+# accounts/apps.py
 from django.apps import AppConfig
 
 class AccountsConfig(AppConfig):
@@ -5,4 +6,5 @@ class AccountsConfig(AppConfig):
     name = 'accounts'
 
     def ready(self):
+        # This will load signals AFTER apps are ready
         import accounts.signals

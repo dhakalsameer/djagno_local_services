@@ -1,14 +1,18 @@
+from urllib import request
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from .forms import RegisterForm
 
 # Create your views here.
 def register_view(request):
-    form = RegisterForm(request.POST or None, request.FILES or None)  # include request.FILES for image upload
-    if form.is_valid():
-        user = form.save()
-        login(request, user)
-        return redirect('home')
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)  
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = RegisterForm()
+
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
