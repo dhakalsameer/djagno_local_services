@@ -63,7 +63,7 @@ def service_update(request, pk):
     form = ServiceForm(request.POST or None, instance=service)
     if form.is_valid():
         form.save()
-        return redirect('service_list')
+        return redirect('provider_dashboard')
     return render(request, 'services/form.html', {'form': form})
 
 
