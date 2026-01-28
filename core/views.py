@@ -10,6 +10,10 @@ from .models import Service, Booking
 from datetime import date
 from .forms import ReviewForm
 from .utils import auto_complete_bookings
+from django.http import HttpResponseForbidden
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 
 # Create your views here.
@@ -21,27 +25,35 @@ def service_list(request):
 
 @login_required
 def service_create(request):
+    # Only service providers can create services
     if request.user.profile.role != 'provider':
         return redirect('service_list')
 
     form = ServiceForm(request.POST or None, request.FILES or None, user=request.user)
+
     if form.is_valid():
         service = form.save(commit=False)
-        
-        # Check if provider entered a new category
+        service.provider = request.user  # Assign logged-in user automatically
+
+        # Handle new category if entered
         new_cat_name = form.cleaned_data.get('new_category')
         if new_cat_name:
+            # This assumes ServiceCategory now has 'provider' ForeignKey
             category, created = ServiceCategory.objects.get_or_create(
-                name=new_cat_name,
+                name=new_cat_name.strip(),
                 provider=request.user
             )
             service.category = category
+        else:
+            # Assign selected category from form (if any)
+            service.category = form.cleaned_data.get('category')
 
-        service.provider = request.user
         service.save()
+        form.save_m2m()  # If form has ManyToMany fields
         return redirect('provider_dashboard')
 
     return render(request, 'services/form.html', {'form': form})
+
 
 
 
@@ -62,31 +74,74 @@ def service_delete(request, pk):
     return redirect('service_list')
 
 
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.core.mail import send_mail
+from django.conf import settings
+
 @login_required
 def book_service(request, pk):
     service = get_object_or_404(Service, pk=pk)
 
+    # 🚫 Providers cannot book services
+    if hasattr(request.user, 'profile') and request.user.profile.role == 'provider':
+        return HttpResponseForbidden("Providers cannot book services.")
+
     if request.method == 'POST':
-        date = request.POST['date']
-        start = request.POST['start']
-        end = request.POST['end']
+        booking_date = request.POST.get('date')
+        start = request.POST.get('start')
+        end = request.POST.get('end')
 
         exists = Booking.objects.filter(
             service=service,
-            booking_date=date,
+            booking_date=booking_date,
             start_time=start,
             status__in=['pending', 'accepted']
-        ).exists()     
+        ).exists()
 
         if not exists:
-            Booking.objects.create(
+            booking = Booking.objects.create(
                 customer=request.user,
                 service=service,
-                booking_date=date,
+                booking_date=booking_date,
                 start_time=start,
                 end_time=end
             )
-            return redirect('service_list')
+
+            # 📧 Email to provider
+            send_mail(
+                subject='New Service Booking',
+                message=f"""
+You have a new booking request.
+
+Service: {service.title}
+Date: {booking.booking_date}
+Time: {booking.start_time} - {booking.end_time}
+Customer: {request.user.username}
+                """,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[service.provider.email],
+                fail_silently=False,
+            )
+
+            # 📧 Email to customer
+            send_mail(
+                subject='Booking Submitted',
+                message=f"""
+Your booking request has been sent.
+
+Service: {service.title}
+Date: {booking.booking_date}
+Time: {booking.start_time} - {booking.end_time}
+Status: Pending approval
+                """,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[request.user.email],
+                fail_silently=False,
+            )
+
+            return redirect('customer_dashboard')
 
     return render(request, 'booking/book.html', {'service': service})
 
@@ -184,19 +239,57 @@ def provider_dashboard(request):
     })
 
 
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+
 @login_required
 def update_booking_status(request, booking_id, status):
-    booking = get_object_or_404(
-        Booking,
-        id=booking_id,
-        service__provider=request.user
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    # 🚫 Only provider can update their bookings
+    if request.user != booking.service.provider:
+        return HttpResponseForbidden("You are not allowed to do this.")
+
+    if status not in ['accepted', 'cancelled']:
+        return redirect('provider_dashboard')
+
+    booking.status = status
+    booking.save()
+
+    # 📧 EMAIL TO CUSTOMER (HTML)
+    subject = f"Booking {status.title()} – {booking.service.title}"
+
+    html_content = render_to_string(
+        'emails/booking_status.html',
+        {
+            'booking': booking,
+            'status': status,
+        }
     )
 
-    if status in ['accepted', 'cancelled']:
-        booking.status = status
-        booking.save()
+    text_content = f"""
+Your booking has been {status}.
+
+Service: {booking.service.title}
+Date: {booking.booking_date}
+Status: {status.title()}
+"""
+
+    email = EmailMultiAlternatives(
+        subject,
+        text_content,
+        settings.EMAIL_HOST_USER,
+        [booking.customer.email],
+    )
+    email.attach_alternative(html_content, "text/html")
+    email.send()
 
     return redirect('provider_dashboard')
+
 
 @login_required
 def customer_dashboard(request):

@@ -22,10 +22,14 @@ class Profile(models.Model):
 
 # ------------------ Category ------------------
 class ServiceCategory(models.Model):
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories')
     name = models.CharField(max_length=100, unique=True)
     icon = models.ImageField(upload_to='category_icons/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
+    class Meta:
+        unique_together = ('provider', 'name')
+        
     def __str__(self):
         return self.name
 

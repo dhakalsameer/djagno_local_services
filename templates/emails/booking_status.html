@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9fafb;
+        padding: 20px;
+      }
+      .card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 6px;
+        max-width: 600px;
+        margin: auto;
+      }
+      .accepted {
+        color: #16a34a;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      .rejected {
+        color: #dc2626;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h2>Hello {{ booking.customer.username }},</h2>
+
+      <p>
+        Your booking for
+        <strong>{{ booking.service.title }}</strong>
+        has been updated.
+      </p>
+
+      {% if status == 'accepted' %}
+      <p class="accepted">Status: Accepted</p>
+      {% else %}
+      <p class="rejected">Status: Rejected</p>
+      {% endif %}
+
+      <hr />
+
+      <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+      <p>
+        <strong>Time:</strong>
+        {{ booking.start_time }} – {{ booking.end_time }}
+      </p>
+
+      {% if status == 'accepted' %}
+      <p>🎉 Your booking has been approved by the provider.</p>
+      {% else %}
+      <p>❌ Unfortunately, the provider could not accept this booking.</p>
+      {% endif %}
+
+      <div class="footer">
+        🇳🇵 Local Services Nepal<br />
+        Please do not reply to this email.
+      </div>
+    </div>
+  </body>
+</html>
