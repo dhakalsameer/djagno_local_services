@@ -9,7 +9,7 @@ from django.db.models import Avg, Count
 from .models import Service, Booking
 from datetime import date
 from .forms import ReviewForm
-from django.http import HttpResponseForbidden
+from .utils import auto_complete_bookings
 
 
 # Create your views here.
@@ -125,38 +125,10 @@ def home(request):
         'user_role': user_role
     })
 
+
+
 @login_required
 def book_service(request, pk):
-    service = get_object_or_404(Service, pk=pk)
-
-    # 🚫 Providers cannot book
-    if request.user.role == 'provider':
-        return HttpResponseForbidden("Providers cannot book services.")
-
-    if request.method == 'POST':
-        date = request.POST['date']
-        start = request.POST['start']
-        end = request.POST['end']
-
-        exists = Booking.objects.filter(
-            service=service,
-            booking_date=date,
-            start_time=start,
-            status__in=['pending', 'accepted']
-        ).exists()
-
-        if not exists:
-            Booking.objects.create(
-                customer=request.user,
-                service=service,
-                booking_date=date,
-                start_time=start,
-                end_time=end
-            )
-            return redirect('customer_dashboard')
-
-    return render(request, 'booking/book.html', {'service': service})
-
     service = get_object_or_404(Service, pk=pk)
 
     error = None
@@ -196,6 +168,8 @@ def book_service(request, pk):
 
 @login_required
 def provider_dashboard(request):
+    auto_complete_bookings()
+    ...
     if request.user.profile.role != 'provider':
         return redirect('home')
 
@@ -226,6 +200,8 @@ def update_booking_status(request, booking_id, status):
 
 @login_required
 def customer_dashboard(request):
+    auto_complete_bookings()
+    ...
     bookings = Booking.objects.filter(customer=request.user).order_by('-created_at')
     services = Service.objects.filter(is_active=True)
     today = date.today()
