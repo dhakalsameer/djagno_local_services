@@ -1,97 +1,114 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+  <h1 class="text-3xl font-bold mb-6">Local Services Marketplace 🇳🇵</h1>
 
-<h1 class="text-3xl font-bold mb-6">Local Services Marketplace 🇳🇵</h1>
+  <!-- Top Rated Services -->
+  <h2 class="text-2xl font-semibold mb-4">⭐ Top Rated Services</h2>
 
-<!-- Top Services -->
-<h2 class="text-2xl font-semibold mb-3">⭐ Top Rated Services</h2>
+  {% if top_services %}
+    <div class="grid md:grid-cols-2 gap-4 mb-8">
+      {% for service in top_services %}
+        <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-lg">{{ service.title }}</h3>
+            <p class="text-sm text-gray-600">
+              📍 {{ service.location }} | 👤 {{ service.provider.username }}
+            </p>
+            <p class="mt-2">
+              ⭐ Rating: {{ service.avg_rating|default:"No ratings yet" }}
+            </p>
+          </div>
 
-<div class="grid md:grid-cols-2 gap-4 mb-8">
-  {% for service in top_services %}
-  <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
-    <div>
-      <h3 class="font-bold text-lg">{{ service.title }}</h3>
-      <p class="text-sm text-gray-600">
-        📍 {{ service.location }} | 👤 {{ service.provider.username }}
-      </p>
-      <p class="mt-2">
-        ⭐ Rating: {{ service.avg_rating|default:"No ratings yet" }}
-      </p>
+          <div class="mt-4 flex justify-between items-center">
+            <a
+              href="{% url 'service_detail' service.id %}"
+              class="text-blue-600 hover:underline"
+            >
+              View Details →
+            </a>
+
+            {% if user_role != 'provider' %}
+              {% if service.id not in booked_service_ids %}
+                <a
+                  href="{% url 'book_service' service.id %}"
+                  class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
+                  Book Now
+                </a>
+              {% else %}
+                <span class="text-gray-500 font-medium">Already Booked ✅</span>
+              {% endif %}
+
+            {% elif user_role == 'provider' and service.provider == request.user %}
+
+              <a
+                href="{% url 'service_update' service.id %}"
+                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              >
+                Edit
+              </a>
+
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
     </div>
+  {% else %}
+    <p class="text-gray-500 mb-8">No services yet.</p>
+  {% endif %}
 
-    <div class="mt-4 flex justify-between items-center">
-      <a
-        href="{% url 'service_detail' service.id %}"
-        class="text-blue-600 hover:underline"
-      >
-        View Details →
-      </a>
+  <!-- Most Booked Services -->
+  <h2 class="text-2xl font-semibold mb-4">🔥 Most Booked Services</h2>
 
-      {% if user_role != 'provider' %}
-      <!-- Customer sees Book Now -->
-      <a
-        href="{% url 'book_service' service.id %}"
-        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Book Now
-      </a>
-      {% elif user_role == 'provider' and service.provider == request.user %}
-      <!-- Provider sees Edit only on their own services -->
-      <a
-        href="{% url 'service_update' service.id %}"
-        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-      >
-        Edit
-      </a>
-      {% endif %}
+  {% if most_booked %}
+    <div class="grid md:grid-cols-2 gap-4">
+      {% for service in most_booked %}
+        <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-lg">{{ service.title }}</h3>
+            <p class="text-sm text-gray-600">
+              📍 {{ service.location }} | 👤 {{ service.provider.username }}
+            </p>
+            <p class="mt-2">📅 Bookings: {{ service.total_bookings }}</p>
+          </div>
+
+          <div class="mt-4 flex justify-between items-center">
+            <a
+              href="{% url 'service_detail' service.id %}"
+              class="text-blue-600 hover:underline"
+            >
+              View Details →
+            </a>
+
+            {% if user_role != 'provider' %}
+              {% if service.id not in booked_service_ids %}
+                <a
+                  href="{% url 'book_service' service.id %}"
+                  class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
+                  Book Now
+                </a>
+              {% else %}
+                <span class="text-gray-500 font-medium">Already Booked ✅</span>
+              {% endif %}
+
+            {% elif user_role == 'provider' and service.provider == request.user %}
+
+              <a
+                href="{% url 'service_update' service.id %}"
+                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              >
+                Edit
+              </a>
+
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
     </div>
-  </div>
-  {% empty %}
-  <p>No services yet.</p>
-  {% endfor %}
+  {% else %}
+    <p class="text-gray-500">No bookings yet.</p>
+  {% endif %}
 </div>
-
-<!-- Most Booked Services -->
-<h2 class="text-2xl font-semibold mb-3">🔥 Most Booked Services</h2>
-
-<div class="grid md:grid-cols-2 gap-4">
-  {% for service in most_booked %}
-  <div class="bg-white p-4 rounded shadow flex flex-col justify-between">
-    <div>
-      <h3 class="font-bold text-lg">{{ service.title }}</h3>
-      <p class="text-sm text-gray-600">
-        📍 {{ service.location }} | 👤 {{ service.provider.username }}
-      </p>
-      <p class="mt-2">📅 Bookings: {{ service.total_bookings }}</p>
-    </div>
-
-    <div class="mt-4 flex justify-between items-center">
-      <a
-        href="{% url 'service_detail' service.id %}"
-        class="text-blue-600 hover:underline"
-      >
-        View Details →
-      </a>
-
-      {% if user_role != 'provider' %}
-      <a
-        href="{% url 'book_service' service.id %}"
-        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Book Now
-      </a>
-      {% elif user_role == 'provider' and service.provider == request.user %}
-      <a
-        href="{% url 'service_update' service.id %}"
-        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-      >
-        Edit
-      </a>
-      {% endif %}
-    </div>
-  </div>
-  {% empty %}
-  <p>No bookings yet.</p>
-  {% endfor %}
-</div>
-
 {% endblock %}

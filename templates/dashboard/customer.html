@@ -1,68 +1,82 @@
 {% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4 py-6">
+  <!-- ================= My Bookings ================= -->
+  <h1 class="text-3xl font-bold mb-6">My Bookings 🇳🇵</h1>
 
-<h1 class="text-3xl font-bold mb-6">My Bookings 🇳🇵</h1>
+  {% if bookings %}
+  <ul class="space-y-4">
+    {% for booking in bookings %}
+    <li class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+      <div class="flex justify-between items-center">
+        <a
+          href="{% url 'service_detail' booking.service.id %}"
+          class="text-xl font-semibold text-blue-600 hover:underline"
+        >
+          {{ booking.service.title }}
+        </a>
+        <span class="text-sm text-gray-500">{{ booking.booking_date }}</span>
+      </div>
 
-<ul>
-  {% for booking in bookings %}
-  <li class="bg-white p-4 mb-3 rounded shadow">
-    <strong>
-      <a
-        href="{% url 'service_detail' booking.service.id %}"
-        class="text-blue-600"
-      >
-        {{ booking.service.title }}
-      </a> </strong
-    ><br />
+      <p class="mt-1 text-gray-700">📍 {{ booking.service.location }}</p>
 
-    📍 {{ booking.service.location }}<br />
-    📅 {{ booking.booking_date }}<br />
+      <div class="mt-2">
+        Status: {% if booking.status == 'pending' %}
+        <span class="text-yellow-600 font-medium">Pending</span>
+        {% elif booking.status == 'accepted' %}
+        <span class="text-green-600 font-medium">Accepted</span>
+        {% elif booking.status == 'completed' %}
+        <span class="text-blue-600 font-medium">Completed</span>
+        {% else %}
+        <span class="text-red-600 font-medium">Cancelled</span>
+        {% endif %}
+      </div>
 
-    <span class="font-medium">
-      Status: {% if booking.status == 'pending' %}
-      <span class="text-yellow-600">Pending</span>
-      {% elif booking.status == 'accepted' %}
-      <span class="text-green-600">Accepted</span>
-      {% elif booking.status == 'completed' %}
-      <span class="text-blue-600">Completed</span>
-      {% else %}
-      <span class="text-red-600">Cancelled</span>
+      {% if booking.status == 'completed' %}
+      <div class="mt-2">
+        <a
+          href="{% url 'add_review' booking.service.id %}"
+          class="text-sm text-blue-600 underline hover:text-blue-800"
+        >
+          ✍️ Add Review
+        </a>
+      </div>
       {% endif %}
-    </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="text-gray-500">You have no bookings yet.</p>
+  {% endif %}
 
-    {% if booking.status == 'completed' %}
-    <div class="mt-2">
+  <!-- ================= Book a Service ================= -->
+  <h2 class="text-2xl font-bold mb-4 mt-10">Book a Service</h2>
+
+  {% if user_role != 'provider' %} {% if services %}
+  <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for service in services %}
+    <li class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+      <h3 class="text-lg font-semibold mb-1">{{ service.title }}</h3>
+      <p class="text-gray-700 mb-2">📍 {{ service.location }}</p>
+
+      {% if service.id not in booked_service_ids %}
       <a
-        href="{% url 'add_review' booking.service.id %}"
-        class="text-sm text-blue-600 underline"
+        href="{% url 'book_service' service.id %}"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition inline-block"
       >
-        ✍️ Add Review
+        Book Now
       </a>
-    </div>
-    {% endif %}
-  </li>
-  {% empty %}
-  <li>No bookings yet.</li>
-  {% endfor %}
-</ul>
-
-<h2 class="text-2xl font-bold mb-4 mt-8">Book a Service</h2>
-
-{% if user_role != 'provider' %}
-<ul>
-  {% for service in services %}
-  <li class="bg-gray-100 p-4 mb-3 rounded shadow">
-    <strong>{{ service.title }}</strong><br />
-    📍 {{ service.location }}<br />
-
-    <a
-      href="{% url 'book_service' service.id %}"
-      class="bg-green-600 text-white px-4 py-2 rounded mt-2 inline-block"
-    >
-      Book Now
-    </a>
-  </li>
-  {% endfor %}
-</ul>
-{% else %}
-<p class="text-gray-600">Providers cannot book services.</p>
-{% endif %} {% endblock %}
+      {% else %}
+      <span class="text-gray-500 font-medium inline-block"
+        >Already Booked ✅</span
+      >
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="text-gray-500">No active services available for booking.</p>
+  {% endif %} {% else %}
+  <p class="text-gray-600">Providers cannot book services.</p>
+  {% endif %}
+</div>
+{% endblock %}

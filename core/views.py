@@ -159,25 +159,35 @@ def service_detail(request, pk):
 def home(request):
     total_services = Service.objects.filter(is_active=True).count()
 
+    # Top 5 rated services
     top_services = (
         Service.objects
         .annotate(avg_rating=Avg('reviews__rating'))
         .order_by('-avg_rating')[:5]
     )
 
+    # Top 5 most booked services
     most_booked = (
         Service.objects
         .annotate(total_bookings=Count('bookings'))
         .order_by('-total_bookings')[:5]
     )
 
+    # Determine user role
     user_role = request.user.profile.role if hasattr(request.user, 'profile') else 'customer'
+
+    # For customers, get the IDs of services they have already booked
+    booked_service_ids = []
+    if user_role != 'provider':
+        booked_service_ids = Booking.objects.filter(customer=request.user) \
+                                            .values_list('service_id', flat=True)
 
     return render(request, 'home.html', {
         'total_services': total_services,
         'top_services': top_services,
         'most_booked': most_booked,
-        'user_role': user_role
+        'user_role': user_role,
+        'booked_service_ids': booked_service_ids,  # pass to template
     })
 
 
