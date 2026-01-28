@@ -9,6 +9,7 @@ from django.db.models import Avg, Count
 from .models import Service, Booking
 from datetime import date
 from .forms import ReviewForm
+from django.http import HttpResponseForbidden
 
 
 # Create your views here.
@@ -124,10 +125,38 @@ def home(request):
         'user_role': user_role
     })
 
-
-
 @login_required
 def book_service(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+
+    # 🚫 Providers cannot book
+    if request.user.role == 'provider':
+        return HttpResponseForbidden("Providers cannot book services.")
+
+    if request.method == 'POST':
+        date = request.POST['date']
+        start = request.POST['start']
+        end = request.POST['end']
+
+        exists = Booking.objects.filter(
+            service=service,
+            booking_date=date,
+            start_time=start,
+            status__in=['pending', 'accepted']
+        ).exists()
+
+        if not exists:
+            Booking.objects.create(
+                customer=request.user,
+                service=service,
+                booking_date=date,
+                start_time=start,
+                end_time=end
+            )
+            return redirect('customer_dashboard')
+
+    return render(request, 'booking/book.html', {'service': service})
+
     service = get_object_or_404(Service, pk=pk)
 
     error = None
@@ -204,7 +233,8 @@ def customer_dashboard(request):
     return render(request, 'dashboard/customer.html', {
         'bookings': bookings,
         'services': services,
-        'today': today
+        'today': today,
+        'user_role': request.user.profile.role,
     })
 
 
