@@ -359,3 +359,17 @@ def add_review(request, service_id):
         'form': form,
         'service': service
     })
+
+
+@login_required
+def complete_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    if booking.service.provider != request.user:
+        return HttpResponseForbidden()
+
+    if booking.status == 'accepted':
+        booking.status = 'completed'
+        booking.save()
+
+    return redirect('provider_dashboard')
