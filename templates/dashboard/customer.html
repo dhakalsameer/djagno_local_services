@@ -38,7 +38,7 @@
 
       <!-- Add Review Button -->
       {% if booking.status == 'completed' %}
-      <a href="{% url 'add_review' booking.service.id %}" class="text-sm text-blue-600 underline hover:text-blue-800 mt-2">
+      <a href="{% url 'add_review' booking.id %}" class="text-sm text-blue-600 underline hover:text-blue-800 mt-2">
         ✍️ Add Review
       </a>
       {% endif %}
