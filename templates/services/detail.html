@@ -41,14 +41,15 @@
   {% endfor %}
 
   <!-- ADD REVIEW (ONLY AFTER COMPLETED BOOKING) -->
-  {% if user.is_authenticated and user.profile.role == 'customer' %}
-  <a
-    href="{% url 'add_review' service.id %}"
-    class="inline-block mt-4 text-blue-600 hover:underline"
-  >
-    ✍️ Add Review
-  </a>
-  {% endif %}
+{% if can_review %}
+<a
+  href="{% url 'add_review' service.id %}"
+  class="inline-block mt-4 text-blue-600 hover:underline"
+>
+  ✍️ Add Review
+</a>
+{% endif %}
+
 </div>
 
 {% endblock %}
