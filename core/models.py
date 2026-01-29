@@ -108,3 +108,6 @@ class Review(models.Model):
 
     class Meta:
         unique_together = ('service', 'customer')
+ 
+    def __str__(self):
+        return f"{self.service.title} - {self.rating}"
