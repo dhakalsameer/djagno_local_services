@@ -271,17 +271,22 @@ from django.conf import settings
 def update_booking_status(request, booking_id, status):
     booking = get_object_or_404(Booking, id=booking_id)
 
-    # 🚫 Only provider can update their bookings
+    # 🚫 Only provider can update
     if request.user != booking.service.provider:
         return HttpResponseForbidden("You are not allowed to do this.")
 
+    # 🚫 Only allow these actions
     if status not in ['accepted', 'cancelled']:
+        return redirect('provider_dashboard')
+
+    # 🚫 Only pending bookings can be accepted or cancelled
+    if booking.status != 'pending':
         return redirect('provider_dashboard')
 
     booking.status = status
     booking.save()
 
-    # 📧 EMAIL TO CUSTOMER (HTML)
+    # 📧 EMAIL TO CUSTOMER
     subject = f"Booking {status.title()} – {booking.service.title}"
 
     html_content = render_to_string(
