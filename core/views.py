@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Service, ServiceCategory
+from .models import Review, Service, ServiceCategory
 from .forms import ServiceForm
 from .models import Booking
 from django.db.models import Q
@@ -149,9 +149,20 @@ Status: Pending approval
 def service_detail(request, pk):
     service = get_object_or_404(Service, pk=pk, is_active=True)
 
+    can_review = False
+
+    if request.user.is_authenticated and request.user.profile.role == 'customer':
+        can_review = Booking.objects.filter(
+            service=service,
+            customer=request.user,
+            status='completed'
+        ).exists()
+
     return render(request, 'services/detail.html', {
-        'service': service
+        'service': service,
+        'can_review': can_review,
     })
+
 
 
 
@@ -330,6 +341,10 @@ def add_review(request, service_id):
     ).exists()
 
     if not has_completed:
+        return redirect('service_detail', pk=service.id)
+    
+    # ❌ Prevent duplicate review
+    if Review.objects.filter(service=service, customer=request.user).exists():
         return redirect('service_detail', pk=service.id)
 
     form = ReviewForm(request.POST or None)
