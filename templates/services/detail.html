@@ -49,6 +49,11 @@
   ✍️ Add Review
 </a>
 {% endif %}
+{% if user.is_authenticated and user.profile.role == 'customer' and not can_review %}
+<p class="text-sm text-gray-500 mt-3">
+  You can add a review after the service is completed.
+</p>
+{% endif %}
 
 </div>
 
