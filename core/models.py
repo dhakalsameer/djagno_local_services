@@ -101,10 +101,11 @@ class Booking(models.Model):
 # ------------------ Review ------------------
 class Review(models.Model):
     booking = models.OneToOneField(
-        Booking,
-        on_delete=models.CASCADE,
-        related_name='review'
-    )
+    Booking,
+    on_delete=models.CASCADE,
+    related_name='review',
+)
+
     service = models.ForeignKey(
         Service,
         on_delete=models.CASCADE,
