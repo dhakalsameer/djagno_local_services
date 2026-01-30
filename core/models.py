@@ -100,14 +100,21 @@ class Booking(models.Model):
 
 # ------------------ Review ------------------
 class Review(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews')
+    booking = models.OneToOneField(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name='review'
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
+
     rating = models.PositiveSmallIntegerField()
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('service', 'customer')
- 
     def __str__(self):
-        return f"{self.service.title} - {self.rating}"
+        return f"{self.service.title} - {self.rating}⭐"
