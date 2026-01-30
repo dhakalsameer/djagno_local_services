@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Review, Service, ServiceCategory
+from .models import Service, ServiceCategory
 from .forms import ServiceForm
 from .models import Booking
 from django.db.models import Q
@@ -13,7 +13,8 @@ from .utils import auto_complete_bookings
 from django.http import HttpResponseForbidden
 from django.core.mail import send_mail
 from django.conf import settings
-
+from .models import Review
+from django.views.decorators.http import require_POST
 
 
 # Create your views here.
@@ -21,6 +22,24 @@ from django.conf import settings
 def service_list(request):
     services = Service.objects.filter(is_active=True)
     return render(request, 'services/list.html', {'services': services})
+
+
+def service_detail(request, pk):
+    service = get_object_or_404(Service, pk=pk, is_active=True)
+
+    can_review = False
+
+    if request.user.is_authenticated and request.user.profile.role == 'customer':
+        can_review = Booking.objects.filter(
+            service=service,
+            customer=request.user,
+            status='completed'
+        ).exists()
+
+    return render(request, 'services/detail.html', {
+        'service': service,
+        'can_review': can_review,
+    })
 
 
 @login_required
@@ -149,20 +168,9 @@ Status: Pending approval
 def service_detail(request, pk):
     service = get_object_or_404(Service, pk=pk, is_active=True)
 
-    can_review = False
-
-    if request.user.is_authenticated and request.user.profile.role == 'customer':
-        can_review = Booking.objects.filter(
-            service=service,
-            customer=request.user,
-            status='completed'
-        ).exists()
-
     return render(request, 'services/detail.html', {
-        'service': service,
-        'can_review': can_review,
+        'service': service
     })
-
 
 
 
@@ -317,6 +325,7 @@ Status: {status.title()}
     return redirect('provider_dashboard')
 
 
+
 @login_required
 def customer_dashboard(request):
     auto_complete_bookings()
@@ -339,6 +348,7 @@ def customer_dashboard(request):
 def add_review(request, service_id):
     service = get_object_or_404(Service, id=service_id)
 
+    # ✅ Check completed booking
     has_completed = Booking.objects.filter(
         service=service,
         customer=request.user,
@@ -347,12 +357,13 @@ def add_review(request, service_id):
 
     if not has_completed:
         return redirect('service_detail', pk=service.id)
-    
+
     # ❌ Prevent duplicate review
     if Review.objects.filter(service=service, customer=request.user).exists():
         return redirect('service_detail', pk=service.id)
 
     form = ReviewForm(request.POST or None)
+
     if form.is_valid():
         review = form.save(commit=False)
         review.service = service
@@ -367,14 +378,19 @@ def add_review(request, service_id):
 
 
 @login_required
+@require_POST
 def complete_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
+    # 🔐 Only provider can complete
     if booking.service.provider != request.user:
-        return HttpResponseForbidden()
+        return HttpResponseForbidden("Not allowed")
 
-    if booking.status == 'accepted':
-        booking.status = 'completed'
-        booking.save()
+    # if booking.status == 'accepted':
+    #     booking.status = 'completed'
+    #     booking.save()
+    
+    booking.status = 'completed'
+    booking.save(update_fields=['status'])
 
     return redirect('provider_dashboard')

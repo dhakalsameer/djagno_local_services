@@ -22,11 +22,16 @@ urlpatterns = [
 
     # ✅ Booking actions
     path(
+    'booking/<int:booking_id>/complete/',
+    complete_booking,
+    name='complete_booking'
+),
+    path(
         'booking/<int:booking_id>/<str:status>/',
         update_booking_status,
         name='update_booking_status'
     ),
-    path('booking/<int:booking_id>/complete/', complete_booking, name='complete_booking'),
+  
 
 
     # ⭐ Reviews
