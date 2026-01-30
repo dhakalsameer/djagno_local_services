@@ -10,7 +10,7 @@
 
       <a
         href="{% url 'home' %}"
-        class="px-3 py-2 rounded-md text-sm font-medium transition
+        class="px-3 py-2 rounded-md text-lg font-medium transition
         {% if request.path == '/' %}
           bg-blue-50 text-blue-700
         {% else %}
@@ -40,7 +40,7 @@
         {% else %}
           <a
             href="{% url 'customer_dashboard' %}"
-            class="px-3 py-2 rounded-md text-sm font-medium transition
+            class="px-3 py-2 rounded-md text-lg font-medium transition
             {% if 'dashboard/customer' in request.path %}
               bg-blue-50 text-blue-700
             {% else %}
@@ -55,11 +55,11 @@
         <div class="relative group">
           <button class="flex items-center space-x-2 px-2 py-1 rounded-md hover:bg-gray-100 transition">
             {% if user.profile.profile_photo %}
-              <img src="{{ user.profile.profile_photo.url }}" class="h-8 w-8 rounded-full object-cover ring-2 ring-blue-200" />
+              <img src="{{ user.profile.profile_photo.url }}" class="h-12 w-12 rounded-full object-cover ring-2 ring-blue-200" />
             {% else %}
               <img src="{% static 'default-avatar.png' %}" class="h-8 w-8 rounded-full object-cover ring-2 ring-blue-200" />
             {% endif %}
-            <span class="text-sm font-medium text-gray-700">{{ user.username }}</span>
+            <span class="text-lg font-medium text-gray-800">{{ user.username }}</span>
             <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
             </svg>
@@ -67,12 +67,12 @@
 
           <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition transform origin-top-right z-50">
             {% if user.profile.role == 'provider' %}
-              <a href="{% url 'provider_dashboard' %}" class="block px-4 py-2 text-sm hover:bg-gray-50">Provider Dashboard</a>
+              <a href="{% url 'provider_dashboard' %}" class="block px-4 py-2 text-lg hover:bg-gray-50">Provider Dashboard</a>
             {% else %}
-              <a href="{% url 'customer_dashboard' %}" class="block px-4 py-2 text-sm hover:bg-gray-50">My Bookings</a>
+              <a href="{% url 'customer_dashboard' %}" class="block px-4 py-2 text-lg hover:bg-gray-50">My Bookings</a>
             {% endif %}
             <hr class="my-1" />
-            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</a>
+            <a href="{% url 'logout' %}" class="block px-4 py-2 text-lg text-red-800 hover:bg-red-50">Logout</a>
           </div>
         </div>
 
