@@ -1,6 +1,7 @@
 # 🇳🇵 Local Services Marketplace (Django)
 
-**A Nepal-focused, real-world service booking platform**  
+**A Nepal-focused, real-world service booking platform**
+
 ---
 
 ## 🚀 Project Overview
@@ -85,12 +86,12 @@ Unlike basic CRUD projects (like Room Finder), this platform includes:
 ### 5️⃣ Dashboards
 
 **Provider Dashboard**
-- Total bookings
-- Ratings & reviews
+- Total bookings  
+- Ratings & reviews  
 
 **Customer Dashboard**
-- Booking history
-- Active bookings
+- Booking history  
+- Active bookings  
 
 ---
 
